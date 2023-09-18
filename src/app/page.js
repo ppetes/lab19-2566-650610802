@@ -36,10 +36,13 @@ export default function Home() {
   };
 
   const loadMyCourses = async () => {
+    setLoadingMyCourses(true);
     const resp = await axios.get("/api/enrollment", {
       headers: { Authorization: `Bearer ${token}` },
     });
+
     setMyCourses(resp.data.courses);
+    setLoadingMyCourses(false);
   };
 
   useEffect(() => {
@@ -54,12 +57,15 @@ export default function Home() {
 
   const login = async () => {
     try {
+      setLoadingLogin(true);
       const resp = await axios.post("/api/user/login", { username, password });
       setToken(resp.data.token);
       setAuthenUsername(resp.data.username);
       setUsername("");
       setPassword("");
+      setLoadingLogin(false);
     } catch (error) {
+      setLoadingLogin(false);
       if (error.response.data) {
         alert(error.response.data.message);
       }
@@ -70,6 +76,7 @@ export default function Home() {
     setAuthenUsername(null);
     setToken(null);
     setMyCourses(null);
+    setLoadingLogin(false);
   };
 
   return (
@@ -105,7 +112,10 @@ export default function Home() {
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
               />
-              <Button onClick={login}>Login</Button>
+
+              {!loadingLogin && <Button onClick={login}>Login</Button>}
+
+              {loadingLogin && <Button disabled>Login...</Button>}
             </Group>
           )}
           {authenUsername && (
@@ -133,9 +143,13 @@ export default function Home() {
             ))}
 
           {/* Do something with below loader!! */}
-          <Loader variant="dots" />
+          {loadingMyCourses && <Loader variant="dots" />}
         </Paper>
-        <Footer year="2023" fullName="Chayanin Suatap" studentId="650610560" />
+        <Footer
+          year="2023"
+          fullName="Ratchapon Prangthong"
+          studentId="650610802"
+        />
       </Stack>
     </Container>
   );
